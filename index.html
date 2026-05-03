@@ -2,74 +2,102 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Smart Water & Air Monitor 🐠</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AquaUI IoT Dashboard - Intelligence Underwater Ecosystem</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-   <header>
-    <div class="header-titles">
-        <h1>Smart Aquaponics Ecosystem</h1>
-        <p class="subtitle">Integrated Real-Time Water and Air Quality Monitoring System based on IoT</p>
+    <div class="glass-bg"></div>
+    <div class="bubbles-overlay"></div>
+    
+    <svg class="seaweed-left" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <path d="M30,100 C35,80 25,60 30,40 C32,30 38,20 35,10" stroke="#00f2ff" stroke-width="2" fill="none"/>
+        <path d="M50,100 C55,70 45,50 50,30 C52,20 58,10 55,0" stroke="#00f2ff" stroke-width="2" fill="none"/>
+        <path d="M70,100 C75,90 65,70 70,50 C72,40 78,30 75,20" stroke="#00f2ff" stroke-width="2" fill="none"/>
+    </svg>
+    <svg class="seaweed-right" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <path d="M40,100 C45,75 35,55 40,35 C42,25 48,15 45,5" stroke="#9333ea" stroke-width="2" fill="none"/>
+        <path d="M60,100 C65,85 55,65 60,45 C62,35 68,25 65,15" stroke="#9333ea" stroke-width="2" fill="none"/>
+    </svg>
+
+    <div class="container">
+        <header class="liquid-header">
+            <div class="brand">
+                <h1 class="modern-title">AQUA<span>UI</span></h1>
+                <p class="tagline">Intelligence Underwater Ecosystem</p>
+            </div>
+            <div class="status-pill">
+                <div class="dot" id="status-dot"></div>
+                <span id="conn-text">SEARCHING NETWORK...</span>
+            </div>
+        </header>
+
+        <div class="bento-grid">
+            <div class="card glass-card">
+                <span class="label">AIR QUALITY (GAS)</span>
+                <div class="main-val"><span id="pol">0</span><small>PPM</small></div>
+                <div class="mini-chart">
+                    <canvas id="gasChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card glass-card main-water">
+                <div class="card-info">
+                    <span class="label">WATER ECOSYSTEM</span>
+                    <div class="split-val">
+                        <div>
+                            <small>WATER TEMP</small>
+                            <div class="val"><span id="wat_t">0.0</span>°</div>
+                        </div>
+                        <div>
+                            <small>PH LEVEL</small>
+                            <div class="val"><span id="ph">0.00</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="aquarium">
+                    <span class="fish f1">🐟</span>
+                    <span class="fish f2">🐠</span>
+                    <span class="crab">🦀</span>
+                </div>
+                <div class="full-chart">
+                    <canvas id="tempChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card glass-card">
+                <span class="label">ATMOSPHERE</span>
+                <div class="stats-row">
+                    <div class="item">
+                        <small>TEMP</small>
+                        <p><span id="air_t">0.0</span>°C</p>
+                    </div>
+                    <div class="item">
+                        <small>HUMIDITY</small>
+                        <p><span id="hum">0</span>%</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card glass-card log-card">
+                <div class="log-header">
+                    <span class="label">Activity Log</span>
+                    <button class="liquid-btn" id="download-csv">EXPORT DATA (CSV)</button>
+                </div>
+                <div id="log-console" class="console"></div>
+            </div>
+        </div>
+
+        <footer class="main-footer">
+            <p>&copy; AquaUI IoT Dashboard By Mahes & Friends. All right reserved.</p>
+        </footer>
     </div>
-    <div id="status-indicator">Device: <span id="conn-status">Connecting...</span></div>
-</header>
-
-    <main class="dashboard-grid">
-        <div class="card air-card">
-            <h4>☁️ Lingkungan Udara</h4>
-            <div class="sensor-row">
-                <div>
-                    <div class="label-with-emoji">🌡️ Suhu</div>
-                    <div class="value" id="air-temp">--</div><span>°C</span>
-                </div>
-                <div>
-                    <div class="label-with-emoji">💧 Lembab</div>
-                    <div class="value" id="humidity">--</div><span>%</span>
-                </div>
-            </div>
-            <canvas id="tempChart"></canvas>
-        </div>
-
-        <div class="card water-card">
-            <h4>💙 Monitoring Air 🌊</h4>
-            <div class="sensor-row">
-                <div>
-                    <div class="label-with-emoji">🌡️ Suhu Air</div>
-                    <div class="value" id="water-temp">--</div><span>°C</span>
-                </div>
-                <div>
-                    <div class="label-with-emoji">🧪 Kadar pH</div>
-                    <div class="value" id="ph-level">--</div><span>pH</span>
-                </div>
-            </div>
-            <div class="emoji-aquarium">
-                <span class="fish-1">🐠</span>
-                <span class="fish-2">🐟</span>
-                <span class="fish-3">🐡</span>
-                <span class="crab">🦀</span>
-                <span class="coral">🪸</span>
-            </div>
-        </div>
-
-        <div class="card pollution-card">
-            <h4>⚠️ Kualitas Udara (Gas)</h4>
-            <div class="value" id="pollution">--</div><span>PPM</span>
-            <canvas id="gasChart"></canvas>
-        </div>
-
-        <div class="card log-card">
-            <h4>📝 Activity Log</h4>
-            <div id="log-container"></div>
-        </div>
-    </main>
-
-    <footer>
-        <p>&copy; IoT Panel Made By Mahes & Friends</p>
-    </footer>
 
     <script src="script.js"></script>
 </body>
