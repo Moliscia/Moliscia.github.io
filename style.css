@@ -1,250 +1,131 @@
-/* FULL RESET & THEME VARIABLES */
 :root {
-    --bg-color: #030712;
-    --card-bg: rgba(15, 23, 42, 0.7);
-    --accent-blue: #38bdf8;
-    --accent-cyan: #22d3ee;
-    --glass-border: rgba(56, 189, 248, 0.2);
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
+    --liquid-white: rgba(255, 255, 255, 0.12);
+    --border-white: rgba(255, 255, 255, 0.25);
+    --accent: #00f2ff;
+    --accent-glow: rgba(0, 242, 255, 0.3);
+    --success: #00ffcc;
+    --danger: #ff4b2b;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
 
 body {
-    background: radial-gradient(circle at top right, #0c4a6e, #030712);
-    background-attachment: fixed;
-    color: var(--text-primary);
-    font-family: 'Poppins', sans-serif;
-    padding: 25px;
+    font-family: 'Inter', sans-serif;
+    background: #020617;
+    color: #ffffff;
     min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
 }
 
-/* HEADER */
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center; /* Menjaga status indikator tetap di tengah secara vertikal */
-    padding-bottom: 20px;
-    margin-bottom: 30px;
-    border-bottom: 1px solid var(--glass-border);
+/* --- UNDERWATER LAYERS --- */
+.glass-bg {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: -2;
+    background: 
+        radial-gradient(circle at 15% 15%, rgba(0, 242, 255, 0.2) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(147, 51, 234, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(30, 58, 138, 0.1) 0%, transparent 50%);
+    filter: blur(80px);
+    animation: waterGlow 15s infinite ease-in-out;
 }
 
-/* Membuat Judul dan Subtitle tersusun atas-bawah */
-.header-titles {
-    display: flex;
-    flex-direction: column;
-    gap: 5px; /* Jarak antara judul dan teks di bawahnya */
+.bubbles-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: -1;
+    background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    opacity: 0.3;
+    pointer-events: none;
 }
 
-h1 {
-    font-size: 1.8rem;
-    font-weight: 800;
-    margin-bottom: 0; /* Reset margin bawah agar tidak terlalu jauh */
-    background: linear-gradient(to right, #7dd3fc, #38bdf8);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+.seaweed-left, .seaweed-right {
+    position: fixed;
+    width: 350px;
+    z-index: -1;
+    opacity: 0.15;
+    pointer-events: none;
 }
 
-/* Gaya untuk teks deskripsi di bawah judul */
-.subtitle {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    font-weight: 400;
-    letter-spacing: 0.5px;
+.seaweed-left { bottom: -50px; left: -50px; animation: seaweedSway 8s infinite ease-in-out; }
+.seaweed-right { top: -50px; right: -80px; transform: scaleX(-1); animation: seaweedSway 10s infinite ease-in-out reverse; }
+
+@keyframes waterGlow { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; } }
+@keyframes seaweedSway { 0%, 100% { transform: rotate(-10deg) translate(0, 0); } 50% { transform: rotate(-5deg) translate(10px, -10px); } }
+
+/* --- LAYOUT --- */
+.container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; z-index: 10; position: relative; }
+
+.liquid-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; }
+.modern-title { font-weight: 800; font-size: 2.8rem; letter-spacing: -2px; background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.6) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.modern-title span { color: var(--accent); }
+.tagline { font-size: 0.7rem; opacity: 0.5; letter-spacing: 2px; text-transform: uppercase; margin-top: 5px; }
+
+.status-pill {
+    background: var(--liquid-white);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--border-white);
+    padding: 10px 20px; border-radius: 50px;
+    display: flex; align-items: center; gap: 10px; font-size: 0.75rem; font-weight: 600;
 }
 
-#status-indicator {
-    background: rgba(0, 0, 0, 0.3);
-    padding: 8px 16px;
-    border-radius: 50px;
-    font-size: 0.85rem;
-    border: 1px solid var(--glass-border);
-}
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--danger); transition: 0.3s; }
+.online-dot { background: var(--success) !important; box-shadow: 0 0 12px var(--success); }
 
-/* DASHBOARD GRID SYSTEM */
-.dashboard-grid {
-    display: grid;
-    /* 3 Kolom untuk sensor di baris pertama */
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-}
+/* --- BENTO GRID & CARDS --- */
+.bento-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
 
-/* CARDS GENERAL STYLE */
 .card {
-    background: var(--card-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    padding: 25px;
-    border-radius: 24px;
-    border: 1px solid var(--glass-border);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-    transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
+    background: var(--liquid-white);
+    backdrop-filter: blur(30px) saturate(160%);
+    border: 1px solid var(--border-white);
+    border-radius: 35px; padding: 30px;
+    position: relative; overflow: hidden;
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), border-color 0.3s ease, box-shadow 0.4s ease;
 }
 
-.card:hover {
-    transform: translateY(-5px);
-    border-color: var(--accent-blue);
-    box-shadow: 0 15px 50px rgba(56, 189, 248, 0.15);
+.card:hover { transform: scale(1.03); border-color: rgba(0, 242, 255, 0.6); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px var(--accent-glow); z-index: 20; }
+
+.card::before {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(400px circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,0.15), transparent 40%);
+    z-index: 11; pointer-events: none; opacity: 0; transition: opacity 0.3s;
 }
+.card:hover::before { opacity: 1; }
 
-/* TYPOGRAPHY INSIDE CARDS */
-h4 {
-    color: var(--text-secondary);
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
+.main-water { grid-row: span 2; display: flex; flex-direction: column; justify-content: space-between; min-height: 480px; }
+.log-card { grid-column: span 2; }
 
-.sensor-row {
-    display: flex;
-    gap: 30px;
-    margin-bottom: 15px;
-}
+/* --- TYPOGRAPHY INSIDE CARDS --- */
+.label { font-size: 0.7rem; font-weight: 600; letter-spacing: 1.5px; opacity: 0.5; margin-bottom: 15px; display: block; text-transform: uppercase; }
+.main-val { font-size: 3.8rem; font-weight: 800; letter-spacing: -3px; }
+.main-val small { font-size: 1.2rem; opacity: 0.3; margin-left: 5px; font-weight: 400; }
+.split-val { display: flex; gap: 40px; }
+.val { font-size: 3rem; font-weight: 700; letter-spacing: -1px; }
+.stats-row { display: flex; gap: 50px; }
+.stats-row p { font-size: 2rem; font-weight: 700; }
+small { font-size: 0.7rem; opacity: 0.4; font-weight: 700; text-transform: uppercase; display: block; }
 
-.label-with-emoji {
-    font-size: 0.8rem;
-    color: #a1a1aa;
-    margin-bottom: 5px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
+/* --- FISH & CHARTS --- */
+.aquarium { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.fish { position: absolute; font-size: 2.5rem; filter: drop-shadow(0 0 15px rgba(0, 242, 255, 0.5)); animation: fishFloat 5s infinite ease-in-out; }
+.f1 { top: 35%; right: 15%; }
+.f2 { top: 55%; right: 35%; font-size: 2rem; animation-delay: 1s; animation-duration: 6s; }
+.crab { position: absolute; bottom: 25px; left: 50%; font-size: 1.8rem; transform: translateX(-50%); animation: crabScuttle 4s infinite linear; }
 
-.value {
-    font-size: 2.8rem;
-    font-weight: 800;
-    color: #fff;
-    text-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
-    display: inline;
-}
+@keyframes fishFloat { 0%, 100% { transform: translate(0, 0) scaleX(1); } 50% { transform: translate(-30px, 10px) scaleX(-1); } }
+@keyframes crabScuttle { 0%, 100% { left: 48%; } 50% { left: 52%; } }
 
-span {
-    font-size: 1rem;
-    color: var(--accent-cyan);
-    margin-left: 5px;
-}
+.mini-chart, .full-chart { position: absolute; bottom: 0; left: 0; width: 100%; height: 160px; z-index: 1; pointer-events: none; opacity: 0.7; }
 
-/* KHUSUS KARTU AIR (WATER CARD) DENGAN EMOJI AKUARIUM */
-.water-card {
-    position: relative;
-    background-color: rgba(7, 89, 133, 0.4);
-    background-image: linear-gradient(to bottom, rgba(56, 189, 248, 0.1), rgba(0,0,0,0));
-    overflow: hidden;
-}
+/* --- LOGS & BUTTONS --- */
+.log-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.console { height: 140px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #a5f3fc; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
+.console div { padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); line-height: 1.4; }
 
-.emoji-aquarium {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none; /* Klik tembus ke kartu */
-    opacity: 0.7;
-}
+.liquid-btn { background: #fff; color: #000; border: none; padding: 10px 22px; border-radius: 15px; font-weight: 800; font-size: 0.75rem; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(255,255,255,0.1); }
+.liquid-btn:hover { background: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 25px var(--accent-glow); }
 
-.emoji-aquarium span {
-    position: absolute;
-    font-size: 2.5rem;
-}
-
-/* Mengatur Posisi Setiap Makhluk Laut */
-.fish-1 { bottom: 20px; right: 20px; transform: scaleX(-1); } /* Ikan kuning hadap kiri */
-.fish-2 { top: 50px; right: 80px; font-size: 1.8rem !important; opacity: 0.5; } /* Ikan biru kecil atas */
-.fish-3 { bottom: 60px; right: 120px; font-size: 2rem !important; } /* Ikan buntal tengah */
-.crab { bottom: 10px; left: 50%; transform: translateX(-50%); font-size: 1.5rem !important; } /* Kepiting dasar tengah */
-.coral { bottom: -10px; right: -10px; font-size: 4rem !important; opacity: 0.3; } /* Karang pojok bawah */
-
-/* Memastikan teks tetap di depan emoji */
-.water-card h4, .water-card .sensor-row {
-    position: relative;
-    z-index: 1;
-}
-
-/* KARTU LOG & CHART */
-.log-card {
-    grid-column: span 3; /* Membuat log memanjang menutupi 3 kolom */
-}
-
-canvas {
-    max-width: 100% !important;
-    height: 150px !important;
-    margin-top: auto; /* Grafik menempel di bawah kartu */
-}
-
-#log-container {
-    height: 150px;
-    overflow-y: auto;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 12px;
-    padding: 15px;
-    font-family: monospace;
-}
-
-.log-entry {
-    padding: 5px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    font-size: 0.85rem;
-    color: #cbd5e1;
-}
-
-/* RESPONSIVE LAYOUT (UNTUK TABLET & HP) */
-/* RESPONSIVE LAYOUT (OPTIMASI HP) */
-@media (max-width: 600px) {
-    body {
-        padding: 15px 10px; /* Kurangi padding agar layar lebih luas */
-    }
-
-    header {
-        flex-direction: column; /* Judul dan Status bertumpuk */
-        align-items: flex-start;
-        gap: 15px;
-    }
-
-    h1 {
-        font-size: 1.5rem; /* Judul agak kecil di HP */
-    }
-
-    .dashboard-grid {
-        grid-template-columns: 1fr; /* Wajib 1 kolom di HP */
-        gap: 15px;
-    }
-
-    .value {
-        font-size: 2.2rem; /* Ukuran angka sensor disesuaikan */
-    }
-
-    .card {
-        padding: 20px; /* Card lebih ramping */
-    }
-
-    .sensor-row {
-        gap: 15px;
-        justify-content: space-between;
-    }
-
-    canvas {
-        height: 120px !important; /* Grafik lebih pendek di HP */
-    }
-
-    .log-card {
-        grid-column: span 1; /* Log tidak boleh melebar */
-    }
-}
-
-footer {
-    text-align: center;
-    margin-top: 50px;
-    color: var(--text-secondary);
-    font-size: 0.8rem;
-}
+.main-footer { text-align: center; margin-top: 50px; font-size: 0.7rem; opacity: 0.3; letter-spacing: 1px; }
